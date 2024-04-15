@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { ChatLayout } from "@/components/chat/chat-layout";
-import { ChatOllama } from "@langchain/community/chat_models/ollama";
-import { AIMessage, HumanMessage } from "@langchain/core/messages";
-import { BytesOutputParser } from "@langchain/core/output_parsers";
-import { ChatRequestOptions } from "ai";
-import { Message, useChat } from "ai/react";
-import React, { useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { ChatLayout } from '@/components/chat/chat-layout';
+import { ChatOllama } from '@langchain/community/chat_models/ollama';
+import { AIMessage, HumanMessage } from '@langchain/core/messages';
+import { BytesOutputParser } from '@langchain/core/output_parsers';
+import { ChatRequestOptions } from 'ai';
+import { Message, useChat } from 'ai/react';
+import React, { useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function Page({ params }: { params: { id: string } }) {
   const {
@@ -19,17 +19,17 @@ export default function Page({ params }: { params: { id: string } }) {
     error,
     stop,
     setMessages,
-    setInput
+    setInput,
   } = useChat();
-  const [chatId, setChatId] = React.useState<string>("");
-  const [selectedDocument, setSelectedDocument] = React.useState<string>("");  
+  const [chatId, setChatId] = React.useState<string>('');
+  const [selectedDocument, setSelectedDocument] = React.useState<string>('');
   const [ollama, setOllama] = React.useState<ChatOllama>();
   const env = process.env.NODE_ENV;
 
   // useEffect(() => {
   //   if (env === "production") {
   //     const newOllama = new ChatOllama({
-  //       baseUrl: process.env.NEXT_PUBLIC_OLLAMA_URL || "http://localhost:11434",
+  //       baseUrl: process.env.NEXT_PUBLIC_BRAINIAX_URL || "http://localhost:11434",
   //       doc: selectedModel,
   //     });
   //     setOllama(newOllama);
@@ -48,47 +48,46 @@ export default function Page({ params }: { params: { id: string } }) {
   const addMessage = (Message: any) => {
     // console.log("addMessage:", Message);
     messages.push(Message);
-    window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event('storage'));
     setMessages([...messages]);
   };
 
+  // Function to handle chatting with Ollama in production (client side)
+  const handleSubmitProduction = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
+    e.preventDefault();
 
-// Function to handle chatting with Ollama in production (client side)
-const handleSubmitProduction = async (
-  e: React.FormEvent<HTMLFormElement>
-) => {
-  e.preventDefault();
+    addMessage({ role: 'user', content: input, id: chatId });
+    setInput('');
 
-  addMessage({ role: "user", content: input, id: chatId });
-  setInput("");
+    if (ollama) {
+      const parser = new BytesOutputParser();
 
-  if (ollama) {
-    const parser = new BytesOutputParser();
+      // console.log(messages);
+      const stream = await ollama
+        .pipe(parser)
+        .stream(
+          (messages as Message[]).map((m) =>
+            m.role == 'user'
+              ? new HumanMessage(m.content)
+              : new AIMessage(m.content),
+          ),
+        );
 
-    // console.log(messages);
-    const stream = await ollama
-      .pipe(parser)
-      .stream(
-        (messages as Message[]).map((m) =>
-          m.role == "user"
-            ? new HumanMessage(m.content)
-            : new AIMessage(m.content)
-        )
-      );
+      const decoder = new TextDecoder();
 
-    const decoder = new TextDecoder();
-
-    let responseMessage = "";
-    for await (const chunk of stream) {
-      const decodedChunk = decoder.decode(chunk);
-      responseMessage += decodedChunk;
+      let responseMessage = '';
+      for await (const chunk of stream) {
+        const decodedChunk = decoder.decode(chunk);
+        responseMessage += decodedChunk;
+      }
+      setMessages([
+        ...messages,
+        { role: 'assistant', content: responseMessage, id: chatId },
+      ]);
     }
-    setMessages([
-      ...messages,
-      { role: "assistant", content: responseMessage, id: chatId },
-    ]);
-  }
-};
+  };
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -104,7 +103,7 @@ const handleSubmitProduction = async (
       },
     };
 
-    if (env === "production" && selectedDocument !== "REST API") {
+    if (env === 'production' && selectedDocument !== 'REST API') {
       handleSubmitProduction(e);
     } else {
       // use the /api/chat route
@@ -118,7 +117,7 @@ const handleSubmitProduction = async (
     if (!isLoading && !error && messages.length > 0) {
       localStorage.setItem(`chat_${params.id}`, JSON.stringify(messages));
       // Trigger the storage event to update the sidebar component
-      window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event('storage'));
     }
   }, [messages, chatId, isLoading, error, params.id]);
 

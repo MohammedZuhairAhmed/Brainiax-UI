@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Form,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Button } from "./ui/button";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
-import { Loader2Icon } from "lucide-react";
-import { Input } from "./ui/input";
+} from '@/components/ui/form';
+import { Button } from './ui/button';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
+import { Loader2Icon } from 'lucide-react';
+import { Input } from './ui/input';
 
 const formSchema = z.object({
   name: z.string().min(1, {
-    message: "Please select a Document to upload",
+    message: 'Please select a Document to upload',
   }),
 });
 
@@ -37,21 +37,21 @@ export default function PullModelForm() {
     const uploadDocs = async () => {
       const formData = new FormData();
       if (file) {
-        formData.append("file", file);
+        formData.append('file', file);
       }
 
-      const url = process.env.NEXT_PUBLIC_BRAINIAX_URL + "/v1/ingest/file"; 
+      const url = process.env.NEXT_PUBLIC_BRAINIAX_URL + '/v1/ingest/file';
       const response = await fetch(url, {
-        method: "POST",
+        method: 'POST',
         body: formData,
       });
 
-      if(response.status == 200) {
-        toast.success("Document Ingested successfully");
+      if (response.status == 200) {
+        toast.success('Document Ingested successfully');
         setIsIngesting(false);
         return;
-      }else{
-        toast.error("Error: " + response.statusText);
+      } else {
+        toast.error('Error: ' + response.statusText);
         setIsIngesting(false);
         return;
       }
@@ -63,7 +63,7 @@ export default function PullModelForm() {
     e.preventDefault();
     if (e.target.files && e.target.files.length > 0) {
       const selectedFile = e.target.files[0];
-      form.setValue("name", e.currentTarget.value);
+      form.setValue('name', e.currentTarget.value);
       setFile(selectedFile);
     }
   };
@@ -88,21 +88,21 @@ export default function PullModelForm() {
             </FormItem>
           )}
         />
-        <div className="space-y-2 w-full">
+        <div className="w-full space-y-2">
           <Button type="submit" className="w-full " disabled={isIngesting}>
             {isIngesting ? (
               <div className="flex items-center gap-2">
-                <Loader2Icon className="animate-spin w-4 h-4" />
+                <Loader2Icon className="h-4 w-4 animate-spin" />
                 <span>Ingesting Document...</span>
               </div>
             ) : (
-              "Ingest Document"
+              'Ingest Document'
             )}
           </Button>
-          <p className="text-xs text-center">
+          <p className="text-center text-xs">
             {isIngesting
-              ? "This may take a while. You can safely close this modal and continue using the app"
-              : "Pressing the button will Ingest the specified File"}
+              ? 'This may take a while. You can safely close this modal and continue using the app'
+              : 'Pressing the button will Ingest the specified File'}
           </p>
         </div>
       </form>

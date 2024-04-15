@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import { ChatLayout } from "@/components/chat/chat-layout";
-import { Button } from "@/components/ui/button";
+import { ChatLayout } from '@/components/chat/chat-layout';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogContent,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import UsernameForm from "@/components/username-form";
-import { ChatOllama } from "@langchain/community/chat_models/ollama";
-import { AIMessage, HumanMessage } from "@langchain/core/messages";
-import { BytesOutputParser } from "@langchain/core/output_parsers";
-import { ChatRequestOptions } from "ai";
-import { Message, useChat } from "ai/react";
-import React, { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import UsernameForm from '@/components/username-form';
+import { ChatOllama } from '@langchain/community/chat_models/ollama';
+import { AIMessage, HumanMessage } from '@langchain/core/messages';
+import { BytesOutputParser } from '@langchain/core/output_parsers';
+import { ChatRequestOptions } from 'ai';
+import { Message, useChat } from 'ai/react';
+import React, { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function Home() {
   const {
@@ -31,8 +31,8 @@ export default function Home() {
     setMessages,
     setInput,
   } = useChat();
-  const [chatId, setChatId] = React.useState<string>("");
-  const [selectedDocument, setSelectedDocument] = React.useState<string>("");
+  const [chatId, setChatId] = React.useState<string>('');
+  const [selectedDocument, setSelectedDocument] = React.useState<string>('');
   const [open, setOpen] = React.useState(false);
   const [ollama, setOllama] = useState<ChatOllama>();
   const env = process.env.NODE_ENV;
@@ -42,21 +42,22 @@ export default function Home() {
       // Save messages to local storage
       localStorage.setItem(`chat_${chatId}`, JSON.stringify(messages));
       // Trigger the storage event to update the sidebar component
-      window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event('storage'));
     }
   }, [messages, chatId, isLoading, error]);
 
   useEffect(() => {
-    if (env === "production") {
+    if (env === 'production') {
       const newOllama = new ChatOllama({
-        baseUrl: process.env.NEXT_PUBLIC_OLLAMA_URL || "http://localhost:11434",
+        baseUrl:
+          process.env.NEXT_PUBLIC_BRAINIAX_URL || 'http://localhost:11434',
         model: selectedDocument,
       });
       setOllama(newOllama);
     }
 
     // console.log("selectedModel:", selectedModel);
-    if (!localStorage.getItem("brainiax_user")) {
+    if (!localStorage.getItem('brainiax_user')) {
       setOpen(true);
     }
   }, [selectedDocument]);
@@ -64,18 +65,18 @@ export default function Home() {
   const addMessage = (Message: any) => {
     // console.log("addMessage:", Message);
     messages.push(Message);
-    window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event('storage'));
     setMessages([...messages]);
   };
 
   // Function to handle chatting with Brainiax in production (client side)
   const handleSubmitProduction = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
 
-    addMessage({ role: "user", content: input, id: chatId });
-    setInput("");
+    addMessage({ role: 'user', content: input, id: chatId });
+    setInput('');
 
     if (ollama) {
       const parser = new BytesOutputParser();
@@ -85,22 +86,22 @@ export default function Home() {
         .pipe(parser)
         .stream(
           (messages as Message[]).map((m) =>
-            m.role == "user"
+            m.role == 'user'
               ? new HumanMessage(m.content)
-              : new AIMessage(m.content)
-          )
+              : new AIMessage(m.content),
+          ),
         );
 
       const decoder = new TextDecoder();
 
-      let responseMessage = "";
+      let responseMessage = '';
       for await (const chunk of stream) {
         const decodedChunk = decoder.decode(chunk);
         responseMessage += decodedChunk;
       }
       setMessages([
         ...messages,
-        { role: "assistant", content: responseMessage, id: chatId },
+        { role: 'assistant', content: responseMessage, id: chatId },
       ]);
     }
   };
@@ -125,7 +126,7 @@ export default function Home() {
       },
     };
 
-    if (env === "production") {
+    if (env === 'production') {
       handleSubmitProduction(e);
     } else {
       // Call the handleSubmit function with the options

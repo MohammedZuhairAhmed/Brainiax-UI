@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from '@/components/ui/popover';
 import {
   Sheet,
   SheetContent,
@@ -13,12 +13,13 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
+} from '@/components/ui/sheet';
+import { Button } from '../ui/button';
+import { CaretSortIcon, HamburgerMenuIcon } from '@radix-ui/react-icons';
+import { Sidebar } from '../sidebar';
+import { Message } from 'ai/react';
+import { useDocuments } from '@/app/hooks/useDocuments';
 
-import { Button } from "../ui/button";
-import { CaretSortIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
-import { Sidebar } from "../sidebar";
-import { Message } from "ai/react";
 interface ChatTopbarProps {
   setSelectedDocument: React.Dispatch<React.SetStateAction<string>>;
   isLoading: boolean;
@@ -32,71 +33,65 @@ export default function ChatTopbar({
   chatId,
   messages,
 }: ChatTopbarProps) {
-  const [documents, setDocuments] = React.useState<string[]>([]);
   const [open, setOpen] = React.useState(false);
-  const [currentDocument, setCurrentDocument] = React.useState<string | null>(null);
-  const [maxWidth, setMaxWidth] = React.useState(0);
+  const { documents, fetchDocuments } = useDocuments();
+  const [currentDocument, setCurrentDocument] = React.useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
-    // Calculate maximum width based on initial models
-    const modelWidths = documents.map((doc) => {
-      const buttonEl = document.createElement("button");
-      buttonEl.textContent = doc;
-      document.body.appendChild(buttonEl);
-      const width = buttonEl.clientWidth;
-      document.body.removeChild(buttonEl);
-      return width;
-    });
-    setMaxWidth(Math.max(...modelWidths)); // Add padding
-  }, [documents]);
-
-  useEffect(() => {
-    // setCurrentDocument(getSelectedModel());
-
-    const env = process.env.NODE_ENV;
-
-    const fetchDocuments = async () => {
-      if (env === "production") {
-        const fetchedDocuments = await fetch(
-          process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/tags"
-        );
-        const json = await fetchedDocuments.json();
-        const uniqueFileNames = new Set<string>(
-          json.data.map((document: any) => document.doc_metadata.file_name)
-        );
-        const documentNames = Array.from(uniqueFileNames);
-        setDocuments(documentNames);
-      } else {
-        const fetchedDocuments = await fetch("/api/tags");
-        const json = await fetchedDocuments.json();
-        const uniqueFileNames = new Set<string>(
-          json.data.map((document: any) => document.doc_metadata.file_name)
-        );
-        const documentNames = Array.from(uniqueFileNames);
-        setDocuments(documentNames);
-      }
+    const fetchData = async () => {
+      await fetchDocuments();
     };
-    fetchDocuments();
-  }, []);
+    fetchData();
+  }, [fetchDocuments, open]);
+  // useEffect(() => {
+  //   // setCurrentDocument(getSelectedModel());
+
+  //   const env = process.env.NODE_ENV;
+
+  //   const fetchDocuments = async () => {
+  //     if (env === "production") {
+  //       const fetchedDocuments = await fetch(
+  //         process.env.NEXT_PUBLIC_BRAINIAX_URL + "/api/tags"
+  //       );
+  //       const json = await fetchedDocuments.json();
+  //       const uniqueFileNames = new Set<string>(
+  //         json.data.map((document: any) => document.doc_metadata.file_name)
+  //       );
+  //       const documentNames = Array.from(uniqueFileNames);
+  //       setDocuments(documentNames);
+  //     } else {
+  //       const fetchedDocuments = await fetch("/api/tags", { next: { revalidate: false} });
+  //       const json = await fetchedDocuments.json();
+  //       const uniqueFileNames = new Set<string>(
+  //         json.data.map((document: any) => document.doc_metadata.file_name)
+  //       );
+  //       const documentNames = Array.from(uniqueFileNames);
+  //       setDocuments(documentNames);
+  //     }
+  //   };
+  //   fetchDocuments();
+  // }, []);
 
   const handleDocumentChange = (document: string) => {
     setCurrentDocument(document);
     setSelectedDocument(document);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("selectedDocument", document);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selectedDocument', document);
     }
     setOpen(false);
   };
 
   return (
-    <div className="w-full flex px-4 py-6  items-center justify-between lg:justify-center ">
+    <div className="flex w-full items-center justify-between  px-4 py-6 lg:justify-center ">
       <Sheet>
         <SheetTrigger>
-          <HamburgerMenuIcon className="lg:hidden w-5 h-5" />
+          <HamburgerMenuIcon className="h-5 w-5 lg:hidden" />
         </SheetTrigger>
         <SheetContent side="left">
           <Sidebar
-            chatId={chatId || ""}
+            chatId={chatId || ''}
             isCollapsed={false}
             isMobile={false}
             messages={messages}
@@ -111,25 +106,26 @@ export default function ChatTopbar({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className={`w-[${maxWidth}px] justify-between`}
+            className={`justify-between`}
           >
-            {currentDocument || "Select Document"}
+            {currentDocument || 'Select Document'}
             <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className={`w-[${maxWidth}px] p-10`}>
+        <PopoverContent className={`w-fit p-5`}>
           {documents.length > 0 ? (
             documents.map((doc) => (
-              <Button
-                key={doc}
-                variant="ghost"
-                className="w-full p-10"
-                onClick={() => {
-                  handleDocumentChange(doc);
-                }}
-              >
-                {doc}
-              </Button>
+              <div key={doc} className="text-center">
+                <Button
+                  variant="ghost"
+                  className="w-fit p-5"
+                  onClick={() => {
+                    handleDocumentChange(doc);
+                  }}
+                >
+                  {doc}
+                </Button>
+              </div>
             ))
           ) : (
             <Button variant="ghost" disabled className=" w-full">
@@ -137,6 +133,29 @@ export default function ChatTopbar({
             </Button>
           )}
         </PopoverContent>
+        {/* <PopoverContent className={`w-fit p-5`}>
+  {isFetching ? ( // Show loading message while fetching documents
+    <p>Fetching documents...</p>
+  ) : documents.length > 0 ? ( // Show document list if available
+    documents.map((doc) => (
+      <div key={doc} className="text-center">
+        <Button
+          variant="ghost"
+          className="w-fit p-5"
+          onClick={() => {
+            handleDocumentChange(doc);
+          }}
+        >
+          {doc}
+        </Button>
+      </div>
+    ))
+  ) : (
+    <Button variant="ghost" disabled className=" w-full">
+      No Documents available
+    </Button>
+  )}
+</PopoverContent> */}
       </Popover>
     </div>
   );
