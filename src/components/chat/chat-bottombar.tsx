@@ -10,7 +10,9 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Textarea } from '../ui/textarea';
 import { EmojiPicker } from '../emoji-picker';
-import { ImageIcon, PaperPlaneIcon, StopIcon } from '@radix-ui/react-icons';
+import { PaperPlaneIcon, StopIcon } from '@radix-ui/react-icons';
+import { TiMicrophoneOutline } from 'react-icons/ti';
+import { set } from 'zod';
 
 export default function ChatBottombar({
   messages,
@@ -24,6 +26,11 @@ export default function ChatBottombar({
   const [message, setMessage] = React.useState(input);
   const [isMobile, setIsMobile] = React.useState(false);
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
+  const [isDisabled, setIsDisabled] = React.useState(true);
+
+  const handleClick = () => {
+    setIsDisabled(!isDisabled);
+  };
 
   React.useEffect(() => {
     const checkScreenWidth = () => {
@@ -71,17 +78,6 @@ export default function ChatBottombar({
             onSubmit={handleSubmit}
             className="relative flex w-full items-center gap-2"
           >
-            <div className="flex">
-              <Link
-                href="#"
-                className={cn(
-                  buttonVariants({ variant: 'secondary', size: 'icon' }),
-                )}
-              >
-                <ImageIcon className="h-6 w-6 text-muted-foreground" />
-              </Link>
-            </div>
-
             <TextareaAutosize
               autoComplete="off"
               value={input}
@@ -92,6 +88,20 @@ export default function ChatBottombar({
               placeholder="Ask Brainiax anything..."
               className="flex h-14 max-h-20 w-full resize-none items-center overflow-hidden rounded-full border border-input px-5 py-4 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:bg-card/35"
             />
+            <div
+              className="flex border-white hover:border"
+              onClick={() => handleClick()}
+            >
+              <Button
+                className="shrink-0"
+                variant="secondary"
+                size="icon"
+                type="submit"
+                disabled={isDisabled}
+              >
+                <TiMicrophoneOutline className=" h-6 w-6 text-muted-foreground" />
+              </Button>
+            </div>
             {!isLoading ? (
               <Button
                 className="shrink-0"
