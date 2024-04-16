@@ -142,6 +142,7 @@ export default function Home() {
           setSelectedDocument={setSelectedDocument}
           messages={messages}
           input={input}
+          setInput={setInput}
           handleInputChange={handleInputChange}
           handleSubmit={onSubmit}
           isLoading={isLoading}

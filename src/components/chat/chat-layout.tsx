@@ -29,6 +29,7 @@ export function ChatLayout({
   navCollapsedSize,
   messages,
   input,
+  setInput,
   handleInputChange,
   handleSubmit,
   isLoading,
@@ -39,7 +40,6 @@ export function ChatLayout({
 }: MergedProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
   const [isMobile, setIsMobile] = useState(false);
-  const { documents, fetchDocuments } = useDocuments();
 
   useEffect(() => {
     const checkScreenWidth = () => {
@@ -106,6 +106,7 @@ export function ChatLayout({
           setSelectedDocument={setSelectedDocument}
           messages={messages}
           input={input}
+          setInput={setInput}
           handleInputChange={handleInputChange}
           handleSubmit={handleSubmit}
           isLoading={isLoading}

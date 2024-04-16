@@ -10,6 +10,7 @@ import CodeDisplayBlock from '../code-display-block';
 export default function ChatList({
   messages,
   input,
+  setInput,
   handleInputChange,
   handleSubmit,
   isLoading,

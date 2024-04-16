@@ -11,6 +11,7 @@ export interface ChatProps {
   setSelectedDocument: React.Dispatch<React.SetStateAction<string>>;
   messages: Message[];
   input: string;
+  setInput: React.Dispatch<React.SetStateAction<string>>;
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleSubmit: (
     e: React.FormEvent<HTMLFormElement>,
@@ -24,6 +25,7 @@ export interface ChatProps {
 export default function Chat({
   messages,
   input,
+  setInput,
   handleInputChange,
   handleSubmit,
   isLoading,
@@ -45,6 +47,7 @@ export default function Chat({
         setSelectedDocument={setSelectedDocument}
         messages={messages}
         input={input}
+        setInput={setInput}
         handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
         isLoading={isLoading}
@@ -56,6 +59,7 @@ export default function Chat({
         setSelectedDocument={setSelectedDocument}
         messages={messages}
         input={input}
+        setInput={setInput}
         handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
         isLoading={isLoading}

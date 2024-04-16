@@ -13,10 +13,12 @@ import { EmojiPicker } from '../emoji-picker';
 import { PaperPlaneIcon, StopIcon } from '@radix-ui/react-icons';
 import { TiMicrophoneOutline } from 'react-icons/ti';
 import { set } from 'zod';
+import useSpeechToText from '@/app/hooks/useSpeechToText';
 
 export default function ChatBottombar({
   messages,
   input,
+  setInput,
   handleInputChange,
   handleSubmit,
   isLoading,
@@ -28,9 +30,27 @@ export default function ChatBottombar({
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const [isDisabled, setIsDisabled] = React.useState(true);
 
-  const handleClick = () => {
-    setIsDisabled(!isDisabled);
+  const { isListening, transcript, startListening, stopListening } =
+    useSpeechToText({ continuous: true });
+
+  const startStopListening = () => {
+    isListening ? stopVoiceInput() : startListening();
   };
+
+  const handleClick = () => {
+    setIsDisabled((cur) => !cur);
+    startStopListening();
+  };
+
+  const stopVoiceInput = () => {
+    setInput(transcript.length ? transcript : '');
+    stopListening();
+  };
+
+  React.useEffect(() => {
+    if (!isDisabled) {
+    }
+  }, [isDisabled]);
 
   React.useEffect(() => {
     const checkScreenWidth = () => {
@@ -80,12 +100,17 @@ export default function ChatBottombar({
           >
             <TextareaAutosize
               autoComplete="off"
-              value={input}
+              value={
+                isListening ? (transcript.length ? transcript : '') : input
+              }
+              disabled={isListening}
               ref={inputRef}
               onKeyDown={handleKeyPress}
               onChange={handleInputChange}
               name="message"
-              placeholder="Ask Brainiax anything..."
+              placeholder={
+                isDisabled ? 'Ask Brainiax anything...' : 'Listening...'
+              }
               className="flex h-14 max-h-20 w-full resize-none items-center overflow-hidden rounded-full border border-input px-5 py-4 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:bg-card/35"
             />
             <div

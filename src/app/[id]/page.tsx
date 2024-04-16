@@ -128,6 +128,7 @@ export default function Page({ params }: { params: { id: string } }) {
         setSelectedDocument={setSelectedDocument}
         messages={messages}
         input={input}
+        setInput={setInput}
         handleInputChange={handleInputChange}
         handleSubmit={onSubmit}
         isLoading={isLoading}
