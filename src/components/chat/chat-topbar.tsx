@@ -45,34 +45,6 @@ export default function ChatTopbar({
     };
     fetchData();
   }, [fetchDocuments, open]);
-  // useEffect(() => {
-  //   // setCurrentDocument(getSelectedModel());
-
-  //   const env = process.env.NODE_ENV;
-
-  //   const fetchDocuments = async () => {
-  //     if (env === "production") {
-  //       const fetchedDocuments = await fetch(
-  //         process.env.NEXT_PUBLIC_BRAINIAX_URL + "/api/tags"
-  //       );
-  //       const json = await fetchedDocuments.json();
-  //       const uniqueFileNames = new Set<string>(
-  //         json.data.map((document: any) => document.doc_metadata.file_name)
-  //       );
-  //       const documentNames = Array.from(uniqueFileNames);
-  //       setDocuments(documentNames);
-  //     } else {
-  //       const fetchedDocuments = await fetch("/api/tags", { next: { revalidate: false} });
-  //       const json = await fetchedDocuments.json();
-  //       const uniqueFileNames = new Set<string>(
-  //         json.data.map((document: any) => document.doc_metadata.file_name)
-  //       );
-  //       const documentNames = Array.from(uniqueFileNames);
-  //       setDocuments(documentNames);
-  //     }
-  //   };
-  //   fetchDocuments();
-  // }, []);
 
   const handleDocumentChange = (document: string) => {
     setCurrentDocument(document);
@@ -133,29 +105,6 @@ export default function ChatTopbar({
             </Button>
           )}
         </PopoverContent>
-        {/* <PopoverContent className={`w-fit p-5`}>
-  {isFetching ? ( // Show loading message while fetching documents
-    <p>Fetching documents...</p>
-  ) : documents.length > 0 ? ( // Show document list if available
-    documents.map((doc) => (
-      <div key={doc} className="text-center">
-        <Button
-          variant="ghost"
-          className="w-fit p-5"
-          onClick={() => {
-            handleDocumentChange(doc);
-          }}
-        >
-          {doc}
-        </Button>
-      </div>
-    ))
-  ) : (
-    <Button variant="ghost" disabled className=" w-full">
-      No Documents available
-    </Button>
-  )}
-</PopoverContent> */}
       </Popover>
     </div>
   );

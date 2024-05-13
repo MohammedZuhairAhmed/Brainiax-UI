@@ -1,59 +1,4 @@
-// // NO SOURCES FILTER
-
-// import {
-//   OpenAIStream,
-//   StreamingTextResponse,
-// } from "ai";
-
-// export const runtime = "edge";
-// export const dynamic = "force-dynamic";
-
-// export async function POST(req: Request) {
-//   const { messages, selectedDocument } = await req.json();
-//   const useContext = selectedDocument !== "LLM CHAT";
-
-//   let docIds: string[] = [];
-
-//   const url1 = process.env.NEXT_PUBLIC_BRAINIAX_URL + "/v1/ingest/list";
-//   const res = await fetch(url1);
-//   const json = await res.json();
-
-//   if (useContext) {
-//     docIds = json.data
-//       .filter(
-//         (document: any) => document.doc_metadata.file_name === selectedDocument
-//       )
-//       .map((document: any) => document.doc_id);
-//   }
-
-//   const url = process.env.NEXT_PUBLIC_BRAINIAX_URL + `/v1/chat/completions`;
-//   const body = JSON.stringify({
-//     context_filter: {
-//       docs_ids: docIds,
-//     },
-//     include_sources: true,
-//     messages: messages,
-//     stream: true,
-//     use_context: useContext,
-//   });
-
-//   const data = await fetch(url, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body,
-//   });
-
-//   const stream = OpenAIStream(data);
-
-//   return new StreamingTextResponse(stream);
-// }
-
-// WITH SOURCES FILTER
-
 import { StreamingTextResponse, AIStream } from 'ai';
-import { use } from 'react';
 
 type Source = {
   file: string;
@@ -159,6 +104,7 @@ function parseStreamData(data: string): string | void {
     }
 
     response += sourcesText;
+    accumulatedSources = []
     return response;
   } else {
     return delta?.content;
